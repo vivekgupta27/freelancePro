@@ -3,39 +3,38 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Briefcase, Shield, Zap, CheckCircle } from 'lucide-react';
 import GoogleSignUpButton from '../auth/GoogleSignUpButton';
 import { UserContext } from '../../shared/ClientRedux';
+import {useSelector,useDispatch} from 'react-redux';
+import { setName,setEmail,setPassword ,reset} from '../../Redux/states/signupSlice';
+import { useSignupMutation } from '../../Redux/apiState/signuapi';
 function SignUp() {
+ 
+  const dispatch=useDispatch();
+ const {name,email,password}=useSelector((state)=>state.signupState)
   const navigate=useNavigate();
   const {SignUp}=useContext(UserContext);
   const [showPassword, setShowPassword] = useState(false);
   
  
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
+  
+ 
 
-    agreeToTerms: false
-  });
+  const [signupUser, { isLoading, isSuccess, error }] = useSignupMutation();
+const Data = useSelector(state => state.signupState); // assuming form slice
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-     const res=await SignUp(formData);
-     if(res.status==200){
-         navigate('/signin')
-     }else{
-       navigate('/signup')
-     }
-     
+    dispatch(reset());
+    try {
+      const res = await signupUser(Data).unwrap(); // unwrap se direct response milta hai
+      console.log('Signup success:', res);
+    } catch (err) {
+      console.error('Signup failed:', err);
+    }
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
 
+
+  
   const benefits = [
     "AI-powered proposal generation",
     "Advanced client management",
@@ -154,8 +153,8 @@ function SignUp() {
                           type="text"
                           id="name"
                           name="name"
-                          value={formData.name}
-                          onChange={(e)=>handleChange(e)}
+                          value={name}
+                        onChange={(e)=>{dispatch(setName(e.target.value))}}
                           className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 backdrop-blur-xl"
                           placeholder="John"
                           required
@@ -178,8 +177,8 @@ function SignUp() {
                         type="email"
                         id="email"
                         name="email"
-                        value={formData.email}
-                        onChange={(e)=>handleChange(e)}
+                        value={email}
+                        onChange={(e)=>{dispatch(setEmail(e.target.value))}}
                         className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 backdrop-blur-xl"
                         placeholder="john@example.com"
                         required
@@ -200,8 +199,8 @@ function SignUp() {
                         type={showPassword ? 'text' : 'password'}
                         id="password"
                         name="password"
-                        value={formData.password}
-                        onChange={(e)=>handleChange(e)}
+                        value={password}
+                        onChange={(e)=>{dispatch(setPassword(e.target.value))}}
                         className="w-full pl-12 pr-12 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 backdrop-blur-xl"
                         placeholder="Create a strong password"
                         required
@@ -221,7 +220,7 @@ function SignUp() {
                
 
                   {/* Sign Up Button */}
-                  <button
+                  <button disabled={isLoading}
                     type="submit"
                     className="w-full btn-premium text-white py-4 rounded-2xl text-lg font-black transition-all duration-500 transform hover:scale-105 relative overflow-hidden group"
                   >
