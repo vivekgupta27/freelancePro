@@ -1,38 +1,48 @@
-import React, { useState ,useContext} from 'react';
+import { useState ,useContext, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Briefcase, Shield, Zap } from 'lucide-react';
 import GoogleLoginButton from './GoogleLogin'
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../../shared/ClientRedux';
-const Login = ({setAuthenticated}) => {
-    const {checkAuth} = useContext(UserContext);
-    const navigate = useNavigate();
- const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+import {useSelector,useDispatch} from 'react-redux';
+import {setEmail,setPassword,reset} from '../../Redux/states/signinSlice'
+import {  useSigninMutation } from '../../Redux/apiState/signuapi';
 
+const Login = ({setAuthenticated}) => {
+   const {email,password,change}=useSelector((state)=>state.signinState);
+   const [showPassword,setShowPassword]=useState(false);
+   const dispatch=useDispatch();
+    const [signinUser,{ isLoading, isSuccess, error }]= useSigninMutation();
+    const Data = useSelector(state => state.signinState);
+    const navigate = useNavigate();
+ 
+
+   
   const handleSubmit = async(e) => {
     e.preventDefault();
-    const res=await checkAuth(formData);
-      // console.log(res);
-            if(res.status==200){
-                navigate("/dashboard");
-            }else{
-              navigate("/signin");
-            }
-  
+    dispatch(reset());
+    try {
+      const res = await signinUser(Data).unwrap();
+      console.log(res.message)
+
+      if(res.message==="Login successful"){
+        setAuthenticated(prev=>!prev);
+        dispatch(setSession(true))
+          navigate("/dashboard");
+      }else{
+        navigate("/signin");
+      }
+
+    } catch (error) {
+       console.log(error)
+    }
   
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
+    if(isLoading){
+      return (<div>
+        Loading...
+      </div>)
+    }
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative flex items-center justify-center">
@@ -89,8 +99,8 @@ const Login = ({setAuthenticated}) => {
                     type="email"
                     id="email"
                     name="email"
-                    value={formData.email}
-                    onChange={handleChange}
+                    value={email}
+                    onChange={(e)=>dispatch(setEmail(e.target.value))}
                     className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 backdrop-blur-xl"
                     placeholder="Enter your email"
                     required
@@ -111,15 +121,15 @@ const Login = ({setAuthenticated}) => {
                     type={showPassword ? 'text' : 'password'}
                     id="password"
                     name="password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    value={password}
+                    onChange={(e)=>dispatch(setPassword(e.target.value))}
                     className="w-full pl-12 pr-12 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 backdrop-blur-xl"
                     placeholder="Enter your password"
                     required
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() =>setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-violet-400 transition-colors duration-300"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -129,16 +139,7 @@ const Login = ({setAuthenticated}) => {
 
               {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="rememberMe"
-                    checked={formData.rememberMe}
-                    onChange={handleChange}
-                    className="w-4 h-4 text-violet-600 bg-white/10 border-white/20 rounded focus:ring-violet-500 focus:ring-2"
-                  />
-                  <span className="ml-3 text-sm text-gray-300">Remember me</span>
-                </label>
+                
                 <Link to="/forgot-password" className="text-sm text-violet-400 hover:text-violet-300 transition-colors duration-300 font-medium">
                   Forgot password?
                 </Link>

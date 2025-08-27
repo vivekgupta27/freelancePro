@@ -13,9 +13,22 @@ export const ApiState = createApi({
         body: formData,
       }),
     }),
+    signin:builder.mutation({
+      query:(formData)=>({
+        url:'/login',
+        method:'POST',
+        body:formData,
+      })
+    }),
+    session:builder.query({
+      query:()=>({
+        url:'/me',
+        method:"GET"
+      })
+    })
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useSignupMutation } = ApiState
+export const { useSignupMutation, useSigninMutation,useSessionQuery } = ApiState

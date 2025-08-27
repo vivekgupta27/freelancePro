@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Briefcase, Shield, Zap, CheckCircle } from 'lucide-react';
 import GoogleSignUpButton from '../auth/GoogleSignUpButton';
@@ -9,14 +9,18 @@ import { useSignupMutation } from '../../Redux/apiState/signuapi';
 function SignUp() {
  
   const dispatch=useDispatch();
- const {name,email,password}=useSelector((state)=>state.signupState)
+ const {name,email,password,change}=useSelector((state)=>state.signupState)
   const navigate=useNavigate();
   const {SignUp}=useContext(UserContext);
   const [showPassword, setShowPassword] = useState(false);
   
  
   
- 
+ useEffect(()=>{
+       if(change){
+        navigate('/signin');
+       }
+ },[change])
 
   const [signupUser, { isLoading, isSuccess, error }] = useSignupMutation();
 const Data = useSelector(state => state.signupState); // assuming form slice
@@ -26,7 +30,10 @@ const Data = useSelector(state => state.signupState); // assuming form slice
     dispatch(reset());
     try {
       const res = await signupUser(Data).unwrap(); // unwrap se direct response milta hai
-      console.log('Signup success:', res);
+       if(res.message==="Register success"){
+             navigate('/signin');
+       }
+
     } catch (err) {
       console.error('Signup failed:', err);
     }

@@ -21,14 +21,13 @@ const App = () => {
 
 const { authenticated, setAuthenticated,loading}=useContext(UserContext);
 
-if (loading){
-  return
-  (
-    <div className='flex justify-center items-center h-screen'>
-       <div className="w-10 h-10  border-4 border-dashed rounded-full animate-spin border-violet-500"></div>
-    </div>
-  )
 
+if (loading) {
+  return (
+    <div className='flex justify-center items-center h-screen'>
+      <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-violet-500"></div>
+    </div>
+  );
 }
   return (
     <Routes>

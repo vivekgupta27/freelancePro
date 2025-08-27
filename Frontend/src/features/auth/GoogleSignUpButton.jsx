@@ -1,6 +1,8 @@
 import { useGoogleLogin } from '@react-oauth/google';
-
+import {useSelector,useDispatch} from 'react-redux';
+import { setChange} from '../../Redux/states/signupSlice';
 const GoogleSignUpButton = () => {
+        const dispatch=useDispatch();
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -13,7 +15,9 @@ const GoogleSignUpButton = () => {
           body: JSON.stringify({ token: tokenResponse.access_token }), // Use access_token
         });
         const data = await res.json();
-        console.log("Signup Success:", data);
+        if(data.message==="Register success"){
+            dispatch(setChange(true));
+        }
       } catch (error) {
         console.error("Signup failed:", error);
       }

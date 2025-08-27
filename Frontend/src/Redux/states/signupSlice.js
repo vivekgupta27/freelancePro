@@ -5,6 +5,7 @@ const initialState={
     name:"",
     email:"",
     password:"",
+    change:false,
 }
 
 
@@ -22,9 +23,13 @@ export const signupSlice=createSlice({
        setPassword:(state,action)=>{
         state.password=action.payload
        },
+       setChange:(state,action)=>{
+        state.change=action.payload
+        console.log(state.change);
+       },
        reset:()=>initialState,
     }
 })
 
-export const {setName,setEmail,setPassword,reset}=signupSlice.actions;
+export const {setName,setEmail,setPassword,setChange,reset}=signupSlice.actions;
 export default signupSlice.reducer;
