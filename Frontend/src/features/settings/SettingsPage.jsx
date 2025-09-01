@@ -1,21 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import {useSelector,useDispatch} from 'react-redux'
+import { useSettingsMutation } from '../../Redux/apiState/signuapi';
+import { setName,setEmail,setNewPassword,setOldPassword } from '../../Redux/states/settingSlice';
+import { userData } from '../../Redux/states/userSlice';
+import { useNavigate } from 'react-router-dom';
 const Settings = () => {
-  const [formData, setFormData] = useState({
-    name: 'John Doe',
-    email: 'john@example.com',
-    theme: 'dark',
-    password: '',
-  });
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = (e) => {
+const {userInfo}=useSelector((state)=>state.userState)
+const navigate=useNavigate();
+useEffect(()=>{
+  dispatch(setName(userInfo.name));
+  dispatch(setEmail(userInfo.email));
+},[])
+const dispatch=useDispatch();
+  // const [formData, setFormData] = useState({
+  //   name: 'John Doe',
+  //   email: 'john@example.com',
+  //   password: '',
+  //   newPassword: '',
+  // });
+   const [settingFn,{isError,isLoading,isSuccess}]=useSettingsMutation()
+  const formData=useSelector((state)=>state.settingState)
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log('Updated Settings:', formData);
-    // send data to backend (if applicable)
+     try {
+        const res=await settingFn(formData).unwrap()
+        dispatch(userData(res.user));
+        if(res){
+        navigate('/dashboard');
+        }
+     } catch (error) {
+       console.log(error)
+     }
   };
 
   return (
@@ -34,8 +51,9 @@ const Settings = () => {
           <input
             id="name"
             name="name"
+            readOnly
             value={formData.name}
-            onChange={handleChange}
+            onChange={(e)=>dispatch(setName(e.target.value))}
             className="bg-[#1c1c1c] border border-[#444] px-4 py-2 rounded-md text-white focus:ring-2 focus:ring-blue-500 outline-none"
             type="text"
           />
@@ -49,8 +67,9 @@ const Settings = () => {
           <input
             id="email"
             name="email"
+            readOnly
             value={formData.email}
-            onChange={handleChange}
+            onChange={(e)=>dispatch(setEmail(e.target.value))}
             className="bg-[#1c1c1c] border border-[#444] px-4 py-2 rounded-md text-white focus:ring-2 focus:ring-blue-500 outline-none"
             type="email"
           />
@@ -59,19 +78,36 @@ const Settings = () => {
        
 
         {/* Password */}
-        <div className="flex flex-col gap-2">
-          <label htmlFor="password" className="text-sm font-medium text-gray-300">
-            New Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="bg-[#1c1c1c] border border-[#444] px-4 py-2 rounded-md text-white focus:ring-2 focus:ring-blue-500 outline-none"
-            type="password"
-          />
-        </div>
+        {userInfo.authProvider==="google"?"":<div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="oldPassword" className="text-sm font-medium text-gray-300">
+              Current Password
+            </label>
+            <input
+              id="oldPassword"
+              name="oldPassword"
+              required
+              value={formData.oldPassword}
+              onChange={(e)=>dispatch(setOldPassword(e.target.value))}
+              className="bg-[#1c1c1c] border border-[#444] px-4 py-2 rounded-md text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              type="password"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password" className="text-sm font-medium text-gray-300">
+              New Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              required
+              value={formData.newPassword}
+              onChange={(e)=>dispatch(setNewPassword(e.target.value))}
+              className="bg-[#1c1c1c] border border-[#444] px-4 py-2 rounded-md text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              type="password"
+            />
+          </div>
+        </div>}
 
         {/* Submit */}
         <button

@@ -1,6 +1,6 @@
 import express from "express"
 
-import {Register,Login,googleRegister,googleLogin,UserDetail,logout} from "../controllers/authControllers.js";
+import {Register,Login,googleRegister,googleLogin,UserDetail,logout,updateSettings} from "../controllers/authControllers.js";
 
 const router=express.Router();
 
@@ -14,7 +14,9 @@ router.post("/google-login", googleLogin);
 
 router.get('/me',UserDetail)
 
-router.get('/logout',logout)
+router.post('/logout',logout)
+
+router.post('/setting',updateSettings)
 
 
 

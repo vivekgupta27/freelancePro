@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { useState,useContext } from 'react';
+import { useState,useContext, useEffect } from 'react';
 
 import MainLayout from './shared/layout/MainLayout';
 import ProtectedRoute from './shared/layout/ProtectedRoute';
@@ -14,10 +14,12 @@ import SettingsPage from './features/settings/SettingsPage';
 
 import Login from './features/auth/Login.jsx';
 import SignUp from "./features/auth/Signup.jsx"
-
+import {useSelector,useDispatch} from 'react-redux';
 import LandingPage from './features/landing/LandingPage.jsx';
 import {UserContext} from './shared/ClientRedux.jsx';
+
 const App = () => {
+   const {isLoggedIn}=useSelector((state)=>state.userState);
 
 const { authenticated, setAuthenticated,loading}=useContext(UserContext);
 
@@ -38,7 +40,7 @@ if (loading) {
       <Route
         path="/signin"
         element={
-          <AuthRoute isAuthenticated={authenticated}>
+          <AuthRoute isAuthenticated={isLoggedIn}>
             <Login setAuthenticated={setAuthenticated} />
           </AuthRoute>
         }
@@ -46,7 +48,7 @@ if (loading) {
       <Route
         path="/signup"
         element={
-          <AuthRoute isAuthenticated={authenticated}>
+          <AuthRoute isAuthenticated={isLoggedIn}>
             <SignUp />
           </AuthRoute>
         }
@@ -57,7 +59,7 @@ if (loading) {
       <Route
         path="/*"
         element={
-          <ProtectedRoute isAuthenticated={authenticated}>
+          <ProtectedRoute isAuthenticated={isLoggedIn}>
             <MainLayout>
               <Routes>
                 <Route path="/dashboard" element={<DashboardPage />} />

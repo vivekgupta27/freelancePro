@@ -8,8 +8,8 @@ dotenv.config();
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const generatePrompt = (freelancerName, client) => `
-You are a professional freelancer named ${freelancerName}.
-Generate a formal and well-structured business proposal for the following client:
+You are a professional freelancer (offering solution related to website making or fixing current code base ) named ${freelancerName}.
+Generate a semi-formal and well-structured business proposal for the following client and don't make the proposal too long to read:
 
 Client Details:
 - Name: ${client.name}
@@ -25,7 +25,7 @@ Client Details:
 - Benefits
 - Call to Action
 
-Ensure the tone is friendly yet professional. Keep it between 300–500 words.
+Ensure the tone is friendly yet professional. Keep it between 200 words.
 Output plain text only — no Markdown or HTML.
 `;
 

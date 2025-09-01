@@ -9,7 +9,7 @@ const UserProvider=({children})=>{
     const navigate=useNavigate();
     const [userInfo,setUserInfo]=useState(null);
       const [authenticated, setAuthenticated] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
  
  const checkSession = async () => {
@@ -34,9 +34,9 @@ const UserProvider=({children})=>{
   };
 
 
-  useEffect(() => {
-    checkSession();
-  }, []);
+  // useEffect(() => {
+  //   checkSession();
+  // }, []);
 
 
  const logout=async()=>{

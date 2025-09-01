@@ -1,23 +1,27 @@
-import {useContext} from 'react';
+
 import { TbLogout } from "react-icons/tb";
-import { UserContext } from '../../shared/ClientRedux';
-import { useNavigate } from 'react-router-dom';
+
+import { useLogoutMutation } from '../../Redux/apiState/signuapi';
+import {logout} from '../../Redux/states/userSlice'
+import {useDispatch} from 'react-redux'
+import { persistor } from '../../Redux/store';
 
 const Logout = ({ toggle }) => {
-  const {logout,setAuthenticated,setUserInfo}=useContext(UserContext);
-  const navigate=useNavigate();
+
+  const dispatch=useDispatch()
+  const  [logoutUser, { isLoading, isError }]=useLogoutMutation()
+
   const handleLogout = async () => {
-    console.log("hi")
-    try {
-      const res = await logout();
-      if (res.status === 200) {
-        setAuthenticated(false);
-        setUserInfo(null);
-        navigate("/");
-      }
-    } catch (error) { 
-      console.log(error);
-    }
+     try {
+       const res=await logoutUser().unwrap();
+       console.log(res); 
+      dispatch(logout());          // Reset Redux state
+      persistor.purge();           // Clear persisted state
+      console.log('Logged out via RTK Query');
+
+     } catch ( err) {
+      console.log(err);
+     }
   };
   return (
     <div className="flex items-center gap-2 font-semibold text-lg py-2 px-2 hover:bg-white hover:text-black transition-all duration-300 ease-in-out rounded-md cursor-pointer mt-5">

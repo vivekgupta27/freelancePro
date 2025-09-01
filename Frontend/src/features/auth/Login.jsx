@@ -6,9 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import {useSelector,useDispatch} from 'react-redux';
 import {setEmail,setPassword,reset} from '../../Redux/states/signinSlice'
 import {  useSigninMutation } from '../../Redux/apiState/signuapi';
-
-const Login = ({setAuthenticated}) => {
+import {login} from '../../Redux/states/userSlice'
+const Login = () => {
    const {email,password,change}=useSelector((state)=>state.signinState);
+   
    const [showPassword,setShowPassword]=useState(false);
    const dispatch=useDispatch();
     const [signinUser,{ isLoading, isSuccess, error }]= useSigninMutation();
@@ -22,12 +23,11 @@ const Login = ({setAuthenticated}) => {
     dispatch(reset());
     try {
       const res = await signinUser(Data).unwrap();
-      console.log(res.message)
+      console.log(res.user)
 
       if(res.message==="Login successful"){
-        setAuthenticated(prev=>!prev);
+        dispatch(login(res.user))
         dispatch(setSession(true))
-          navigate("/dashboard");
       }else{
         navigate("/signin");
       }

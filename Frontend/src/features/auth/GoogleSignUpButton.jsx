@@ -1,6 +1,7 @@
 import { useGoogleLogin } from '@react-oauth/google';
-import {useSelector,useDispatch} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import { setChange} from '../../Redux/states/signupSlice';
+
 const GoogleSignUpButton = () => {
         const dispatch=useDispatch();
   const login = useGoogleLogin({
@@ -32,7 +33,8 @@ const GoogleSignUpButton = () => {
     <button
       onClick={() => login()}
       className="flex items-center justify-center px-4 py-2 rounded-md border border-gray-300 shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 w-full"
-    >
+    > 
+    
       Sign up with Google
     </button>
   );

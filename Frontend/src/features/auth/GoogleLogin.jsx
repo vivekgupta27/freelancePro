@@ -3,10 +3,12 @@ import {useContext} from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../shared/ClientRedux";
-
+import {useSelector,useDispatch} from 'react-redux';
+import { login } from "../../Redux/states/userSlice";
 const GoogleLoginButton = () => {
   const navigate = useNavigate();
   const {setUserInfo,setAuthenticated}=useContext(UserContext);
+  const dispatch=useDispatch()
 
   const handleSuccess = async (credentialResponse) => {
     const token = credentialResponse.credential;
@@ -24,8 +26,9 @@ const GoogleLoginButton = () => {
       const data = await res.json();
       console.log( data);
        if(data){
-        setAuthenticated(true);
-        setUserInfo(data.user);
+        dispatch(login(data.user));
+        // setAuthenticated(true);
+        // setUserInfo(data.user);
          navigate("/dashboard");
        }else{
         navigate("/signin");
