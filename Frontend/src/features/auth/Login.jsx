@@ -1,55 +1,57 @@
-import { useState ,useContext, useEffect} from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Briefcase, Shield, Zap } from 'lucide-react';
-import GoogleLoginButton from './GoogleLogin'
-import { useNavigate } from 'react-router-dom';
-import {useSelector,useDispatch} from 'react-redux';
-import {setEmail,setPassword,reset} from '../../Redux/states/signinSlice'
-import {  useSigninMutation } from '../../Redux/apiState/signuapi';
-import {login} from '../../Redux/states/userSlice'
-const Login = () => {
-   const {email,password,change}=useSelector((state)=>state.signinState);
-   
-   const [showPassword,setShowPassword]=useState(false);
-   const dispatch=useDispatch();
-    const [signinUser,{ isLoading, isSuccess, error }]= useSigninMutation();
-    const Data = useSelector(state => state.signinState);
-    const navigate = useNavigate();
- 
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Briefcase, Shield, Zap } from "lucide-react";
+import GoogleLoginButton from "./GoogleLogin";
+import { useSelector, useDispatch } from "react-redux";
+import { setEmail, setPassword, reset } from "../../Redux/states/signinSlice";
+import { useSigninMutation } from "../../Redux/apiState/signuapi";
+import { login } from "../../Redux/states/userSlice";
+import { toast } from "react-toastify";
 
-   
-  const handleSubmit = async(e) => {
+const Login = () => {
+  const { email, password } = useSelector((state) => state.signinState);
+  const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch();
+  const [signinUser, { isLoading }] = useSigninMutation();
+  const Data = useSelector((state) => state.signinState);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(reset());
     try {
       const res = await signinUser(Data).unwrap();
-      console.log(res.user)
+      console.log(res.user);
 
-      if(res.message==="Login successful"){
-        dispatch(login(res.user))
-        dispatch(setSession(true))
-      }else{
+      if (res.message === "Login successful") {
+        dispatch(login(res.user));
+        toast.success(`Welcome back, ${res.user.name || "User"} 👋`, {
+          autoClose: 2500,
+        });
+        navigate("/dashboard");
+      } else {
+        toast.error(res.message || "Invalid credentials. Please try again.");
         navigate("/signin");
       }
-
     } catch (error) {
-       console.log(error)
+      console.log(error);
+      toast.error("Login failed. Please check your credentials or try again later.");
     }
-  
   };
 
-    if(isLoading){
-      return (<div>
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-white">
         Loading...
-      </div>)
-    }
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative flex items-center justify-center">
       {/* Dynamic Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] animate-pulse"></div>
-        
         <div className="absolute w-96 h-96 bg-gradient-to-r from-violet-600/20 to-purple-600/20 rounded-full blur-3xl animate-pulse top-20 left-20"></div>
         <div className="absolute w-80 h-80 bg-gradient-to-r from-amber-500/15 to-orange-500/15 rounded-full blur-3xl animate-pulse bottom-20 right-20 animation-delay-2000"></div>
         <div className="absolute w-72 h-72 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-full blur-3xl animate-pulse top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animation-delay-4000"></div>
@@ -74,7 +76,7 @@ const Login = () => {
         {/* Sign In Form */}
         <div className="glass-premium rounded-4xl p-10 border border-white/10 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5"></div>
-          
+
           <div className="relative z-10">
             <div className="text-center mb-10">
               <h1 className="text-4xl font-black mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
@@ -100,7 +102,7 @@ const Login = () => {
                     id="email"
                     name="email"
                     value={email}
-                    onChange={(e)=>dispatch(setEmail(e.target.value))}
+                    onChange={(e) => dispatch(setEmail(e.target.value))}
                     className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 backdrop-blur-xl"
                     placeholder="Enter your email"
                     required
@@ -118,18 +120,18 @@ const Login = () => {
                     <Lock className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     id="password"
                     name="password"
                     value={password}
-                    onChange={(e)=>dispatch(setPassword(e.target.value))}
+                    onChange={(e) => dispatch(setPassword(e.target.value))}
                     className="w-full pl-12 pr-12 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 backdrop-blur-xl"
                     placeholder="Enter your password"
                     required
                   />
                   <button
                     type="button"
-                    onClick={() =>setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-violet-400 transition-colors duration-300"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -137,10 +139,12 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Remember Me & Forgot Password */}
+              {/* Forgot Password */}
               <div className="flex items-center justify-between">
-                
-                <Link to="/forgot-password" className="text-sm text-violet-400 hover:text-violet-300 transition-colors duration-300 font-medium">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-violet-400 hover:text-violet-300 transition-colors duration-300 font-medium"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -167,19 +171,19 @@ const Login = () => {
               </div>
 
               {/* Social Login */}
-              <div className="">
-                
-                  
-                   <GoogleLoginButton />
-                
+              <div>
+                <GoogleLoginButton />
               </div>
             </form>
 
             {/* Sign Up Link */}
             <div className="text-center mt-10">
               <p className="text-gray-400">
-                Don't have an account?{' '}
-                <Link to="/signup" className="text-violet-400 hover:text-violet-300 transition-colors duration-300 font-semibold">
+                Don't have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="text-violet-400 hover:text-violet-300 transition-colors duration-300 font-semibold"
+                >
                   Sign up for free
                 </Link>
               </p>
@@ -203,6 +207,6 @@ const Login = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Login
+export default Login;

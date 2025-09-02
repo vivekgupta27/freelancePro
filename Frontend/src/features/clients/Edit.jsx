@@ -1,15 +1,12 @@
-import { useEffect, useState ,useContext} from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { UserContext } from '../../shared/ClientRedux';
 import axios from 'axios';
+import { toast } from 'react-toastify';   // ✅ Import toast
+
 const Edit = () => {
-
   const navigate = useNavigate();
-  const location=useLocation();
-  const client=location.state?.client;
-  
-console.log(location);
-
+  const location = useLocation();
+  const client = location.state?.client;
 
   const [formdata, setFormdata] = useState({
     name: client?.name || '',
@@ -19,28 +16,24 @@ console.log(location);
     status: client?.status || false,
   });
 
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-      try {
-        const res= await axios.put("http://localhost:3000/api/client/update_client/"+client._id,formdata,{
-          withCredentials:true,
-        })
-        console.log(res);
-        if(res.status==200){
-          navigate('/clients')
-        }
-        
-      } catch (error) {
-        console.log(error);
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/api/client/update_client/${client._id}`,
+        formdata,
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        toast.success("✅ Client updated successfully!");  // ✅ Success toast
+        navigate('/clients');
       }
-
-    //console.log('Updated Data:', updatedData); // Just for debug
-
-    // ❌ This won't persist (since 'data' is an imported const), only updates in-memory
-    // If using a real backend, this would be an API PUT/PATCH request
-
-  
+    } catch (error) {
+      console.error(error);
+      toast.error("❌ Failed to update client. Please try again."); // ✅ Error toast
+    }
   };
 
   return (
@@ -124,9 +117,9 @@ console.log(location);
             name="status"
             id="status"
             required
-            value={formdata.status=="true" ? 'true' : 'false'}
+            value={formdata.status === "true" ? "true" : "false"}
             onChange={(e) =>
-              setFormdata({ ...formdata, status: e.target.value=='true'?"true":"false" })
+              setFormdata({ ...formdata, status: e.target.value === "true" ? "true" : "false" })
             }
             className="bg-[#1c1c1c] border border-[#444] rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full appearance-none"
           >
