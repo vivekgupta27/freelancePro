@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const AddClient = () => {
   const [formData, setFormData] = useState({
@@ -28,7 +29,6 @@ const AddClient = () => {
         { withCredentials: true }
       );
 
-      // Clear form inputs after successful submission
       setFormData({
         name: '',
         email: '',
@@ -37,9 +37,10 @@ const AddClient = () => {
         status: 'false',
       });
 
-      // Optionally show a success toast/snackbar
+      toast.success("✅ Client added successfully!");
       console.log("Client added:", res.data);
     } catch (error) {
+      toast.error("❌ Failed to add client. Try again!");
       console.error("Failed to add client:", error);
     }
   };
@@ -52,12 +53,11 @@ const AddClient = () => {
         onSubmit={handleSubmit}
         className="flex flex-col gap-6 w-full bg-[#2a2a2a] p-6 rounded-xl shadow-lg"
       >
-        {/* Input Fields */}
         {[
           { label: "Name", name: "name", type: "text" },
           { label: "Email", name: "email", type: "email" },
-          { label: "phone", name: "phone", type: "text" },
-          { label: "company", name: "company", type: "text" }
+          { label: "Phone", name: "phone", type: "text" },
+          { label: "Company", name: "company", type: "text" }
         ].map(({ label, name, type }) => (
           <div key={name} className="flex flex-col gap-2 w-full">
             <label htmlFor={name} className="text-sm font-medium text-gray-300">{label}</label>
